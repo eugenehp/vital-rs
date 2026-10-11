@@ -1,0 +1,52 @@
+[package]
+name          = "vital"
+version       = "0.0.1"
+edition       = "2021"
+# Inherited from webbluetooth, which requires it. Declared rather than
+# discovered halfway through a build.
+rust-version  = "1.94"
+description   = "Rust client for Vital Neuro EEG headphones over BLE using the Web Bluetooth API"
+keywords      = ["eeg", "exg", "ble", "vital", "ads1299"]
+categories    = ["science", "hardware-support", "wasm"]
+license       = "Apache-2.0"
+readme        = "README.md"
+homepage      = "https://github.com/eugenehp/vital-rs"
+repository    = "https://github.com/eugenehp/vital-rs"
+documentation = "https://docs.rs/vital"
+
+[lib]
+name = "vital"
+path = "src/lib.rs"
+
+# Headless CLI: scan, connect, print every event to stdout.
+[[bin]]
+name = "vital"
+path = "src/main.rs"
+
+[dependencies]
+# The `uuid` feature lets `protocol`'s `Uuid` constants be passed straight in,
+# with no conversion at the call sites.
+#
+# Must stay in lockstep with every other `webbluetooth` requirement in a
+# consuming graph: Cargo treats 0.0.x releases as mutually incompatible, and
+# `Bluetooth::shared()` memoises into a `OnceLock`, so two copies of the crate
+# means two BLE sessions and devices that will not connect.
+webbluetooth = { version = "0.0.3", features = ["uuid"] }
+# Only `sync`: `mpsc` is the event channel handed to callers, and a channel
+# needs no runtime underneath it. The runtime and timer features are native-only
+# (below) — see the header of `src/platform.rs`.
+tokio = { version = "1", default-features = false, features = ["sync"] }
+# Deliberately no `v4`: every UUID in `protocol` is a `from_u128` constant, so
+# no randomness backend has to be configured on wasm.
+uuid   = { version = "1" }
+log    = "0.4"
+anyhow = "1"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio      = { version = "1", features = ["rt", "rt-multi-thread", "time", "macros"] }
+env_logger = "0.11"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+# The two browser primitives `src/platform.rs` routes onto in place of a tokio
+# runtime. Held at the same 0.0.3 `webbluetooth` itself depends on.
+webbluetooth-wasm = "0.0.3"
