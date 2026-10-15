@@ -28,7 +28,7 @@ Shaped after [`muse-rs`](https://crates.io/crates/muse-rs): scan, connect, read 
 
 ```toml
 [dependencies]
-vital = "0.0.1"
+vital = "0.0.2"
 tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
 ```
 

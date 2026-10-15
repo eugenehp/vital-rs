@@ -1,6 +1,6 @@
 [package]
 name          = "vital"
-version       = "0.0.1"
+version       = "0.0.2"
 edition       = "2021"
 # Inherited from webbluetooth, which requires it. Declared rather than
 # discovered halfway through a build.
@@ -31,7 +31,7 @@ path = "src/main.rs"
 # consuming graph: Cargo treats 0.0.x releases as mutually incompatible, and
 # `Bluetooth::shared()` memoises into a `OnceLock`, so two copies of the crate
 # means two BLE sessions and devices that will not connect.
-webbluetooth = { version = "0.0.3", features = ["uuid"] }
+webbluetooth = { version = "0.0.4", features = ["uuid"] }
 # Only `sync`: `mpsc` is the event channel handed to callers, and a channel
 # needs no runtime underneath it. The runtime and timer features are native-only
 # (below) — see the header of `src/platform.rs`.
@@ -48,5 +48,5 @@ env_logger = "0.11"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 # The two browser primitives `src/platform.rs` routes onto in place of a tokio
-# runtime. Held at the same 0.0.3 `webbluetooth` itself depends on.
-webbluetooth-wasm = "0.0.3"
+# runtime. Held at the same 0.0.4 `webbluetooth` itself depends on.
+webbluetooth-wasm = "0.0.4"
